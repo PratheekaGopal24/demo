@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
+import static com.example.demo.util.TimeUtils.TIME_WINDOW_IN_MILLI_SECONDS;
+
 @RestController
 public class TickController {
 
@@ -24,7 +26,7 @@ public class TickController {
 
   @PostMapping("/ticks")
   public ResponseEntity<?> createTicks(@Valid @RequestBody Tick tick) {
-    if (TimeUtils.differenceFromCurrentTime(tick.getTimestamp()) > 60000) {
+    if (!TimeUtils.isWithinTimeRange(tick.getTimestamp(), TIME_WINDOW_IN_MILLI_SECONDS)) {
       return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
     messageBroker.addMessage(tick);
@@ -39,6 +41,7 @@ public class TickController {
   @GetMapping("/statistics/{instrument_identifier}")
   public ResponseEntity<Statistics> getStatistics(
       @PathVariable(value = "instrument_identifier") String instrument) {
-    return ResponseEntity.ok().body(tickInstrumentsReceiver.getAggregatedDataByInstrument(instrument));
+    return ResponseEntity.ok()
+        .body(tickInstrumentsReceiver.getAggregatedDataByInstrument(instrument));
   }
 }

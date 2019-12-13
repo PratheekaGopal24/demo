@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 
 import java.util.*;
 
+import static com.example.demo.util.TimeUtils.TIME_WINDOW_IN_MILLI_SECONDS;
+
 @Controller
 public class TickInstrumentsReceiver implements Receiver {
 
@@ -17,7 +19,7 @@ public class TickInstrumentsReceiver implements Receiver {
     @Override
     public void update(Tick tick) {
         int index = (int) TimeUtils.differenceFromCurrentTime(tick.getTimestamp());
-        if (index > 60000) {
+        if (index > TIME_WINDOW_IN_MILLI_SECONDS) {
             return;
         }
         Map<String, TickAggregatedDataVO> aggregatedDataByInstruments =
@@ -33,7 +35,7 @@ public class TickInstrumentsReceiver implements Receiver {
         } else {
             tickAggregatedDataVO = aggregatedDataByInstruments.get(tick.getInstrument());
             if (tickAggregatedDataVO==null || TimeUtils.differenceFromCurrentTime(tickAggregatedDataVO.getTimeInSeconds() * 1000)
-                    > 60000) {
+                    > TIME_WINDOW_IN_MILLI_SECONDS) {
                 tickAggregatedDataVO= new TickAggregatedDataVO(
                         tick.getTimestamp() / 1000, tick.getPrice(), 1, tick.getPrice(), tick.getPrice());
 
@@ -55,7 +57,7 @@ public class TickInstrumentsReceiver implements Receiver {
                     if (map!=null && map.containsKey(instrument)) {
                         TickAggregatedDataVO tickAggregatedDataVO = map.get(instrument);
                         if (TimeUtils.differenceFromCurrentTime(tickAggregatedDataVO.getTimeInSeconds() * 1000)
-                                < 60000) {
+                                < TIME_WINDOW_IN_MILLI_SECONDS) {
                             statistics.incrementCount(tickAggregatedDataVO.getCount());
                                 statistics.setMaximum(tickAggregatedDataVO.getMaximum());
                                 statistics.setMinimum(tickAggregatedDataVO.getMinimum());

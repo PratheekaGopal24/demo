@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 
 import java.util.Arrays;
 
+import static com.example.demo.util.TimeUtils.TIME_WINDOW_IN_MILLI_SECONDS;
+
 @Controller
 public class TickDataReceiver implements Receiver {
 
@@ -22,7 +24,7 @@ public class TickDataReceiver implements Receiver {
                 tickAggregatedDataVO != null
                     && TimeUtils.differenceFromCurrentTime(
                             tickAggregatedDataVO.getTimeInSeconds() * 1000)
-                        < 60000)
+                        < TIME_WINDOW_IN_MILLI_SECONDS)
         .forEach(
             tickAggregatedDataVO -> {
               statistics.incrementCount(tickAggregatedDataVO.getCount());
@@ -39,7 +41,7 @@ public class TickDataReceiver implements Receiver {
   @Override
   public void update(Tick tick) {
     int index = (int) TimeUtils.differenceFromCurrentTime(tick.getTimestamp());
-    if (index > 60000) {
+    if (index > TIME_WINDOW_IN_MILLI_SECONDS) {
       return;
     }
 
@@ -47,7 +49,7 @@ public class TickDataReceiver implements Receiver {
 
     if (tickAggregatedDataVO == null
         || TimeUtils.differenceFromCurrentTime(tickAggregatedDataVO.getTimeInSeconds() * 1000)
-            > 60000) {
+            > TIME_WINDOW_IN_MILLI_SECONDS) {
       tickAggregatedDataVO =
           new TickAggregatedDataVO(
               tick.getTimestamp() / 1000, tick.getPrice(), 1, tick.getPrice(), tick.getPrice());

@@ -10,24 +10,25 @@ import java.util.List;
 @Component
 public class MessageBroker {
 
-    private List<Receiver> receivers =new ArrayList<>(2);
+  private List<Receiver> receivers = new ArrayList<>(2);
 
-    @Async
-    public void addMessage(Tick tick){
-        receivers.forEach(receiver -> {
-            receiver.update(tick);});
-    }
+  @Async
+  public void addMessage(Tick tick) {
+    receivers.forEach(
+        receiver -> {
+          receiver.update(tick);
+        });
+  }
 
-    public void subscribe(Receiver receiver){
-        receivers.add(receiver);
-    }
+  public void subscribe(Receiver receiver) {
+    receivers.add(receiver);
+  }
 
-    public List<Receiver> getReceivers() {
-        return receivers;
-    }
+  public List<Receiver> getReceivers() {
+    return receivers;
+  }
 
-    public void unsubscribe(Receiver receiver){
-        receivers.remove(receiver);
-    }
-
+  public void unsubscribe(Receiver receiver) {
+    receivers.remove(receiver);
+  }
 }
